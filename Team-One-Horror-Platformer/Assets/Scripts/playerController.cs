@@ -8,6 +8,13 @@ public class playerController : MonoBehaviour
 
     public float drag;
 
+    public float jumpForce;
+    public float jumpCoolDown;
+    public float airMultiplier;
+    bool readyToJump = true;
+
+    public KeyCode jumpKey = KeyCode.Space; 
+
     public float playerHeight;
     public LayerMask ground;
     bool onGround;
@@ -49,13 +56,30 @@ public class playerController : MonoBehaviour
     private void playerIn()
     {
         horizontalIn = Input.GetAxisRaw("Horizontal");
-        verticalIn = Input.GetAxisRaw("Vertical");  
+        verticalIn = Input.GetAxisRaw("Vertical");
+
+        if (Input.GetKey(jumpKey))
+            Debug.Log("space was pressed and is ready:" + readyToJump);
+
+        if (Input.GetKey(jumpKey) && readyToJump && onGround)
+        {
+            readyToJump = false;
+            jump();
+            Invoke(nameof(resetJump), jumpCoolDown);
+        }
     }
 
     private void movePlyr()
     {
         moveDir = orientation.forward * verticalIn + orientation.right * horizontalIn;
-        rb.AddForce(moveDir.normalized * moveSpd * 10f, ForceMode.Force);
+
+        //ground movement
+        if (onGround)
+            rb.AddForce(moveDir.normalized * moveSpd * 10f, ForceMode.Force);
+
+        //air movement
+        else if (!onGround)
+            rb.AddForce(moveDir.normalized * moveSpd * 10f * airMultiplier, ForceMode.Force);
     }
 
     private void speedCtrl()
@@ -67,5 +91,18 @@ public class playerController : MonoBehaviour
             Vector3 limitedVel = flatVel.normalized * moveSpd;
             rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
         }
+    }
+
+    private void jump()
+    {
+        Debug.Log("in jump()");
+        rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+
+        rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+    }
+
+    private void resetJump()
+    {
+        readyToJump = true;
     }
 }

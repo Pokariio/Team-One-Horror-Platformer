@@ -53,13 +53,11 @@ public class playerController : MonoBehaviour
         movePlyr();
     }
 
+    //handles player input
     private void playerIn()
     {
         horizontalIn = Input.GetAxisRaw("Horizontal");
         verticalIn = Input.GetAxisRaw("Vertical");
-
-        if (Input.GetKey(jumpKey))
-            Debug.Log("space was pressed and is ready:" + readyToJump);
 
         if (Input.GetKey(jumpKey) && readyToJump && onGround)
         {
@@ -69,6 +67,7 @@ public class playerController : MonoBehaviour
         }
     }
 
+    //actually moves the player
     private void movePlyr()
     {
         moveDir = orientation.forward * verticalIn + orientation.right * horizontalIn;
@@ -82,6 +81,7 @@ public class playerController : MonoBehaviour
             rb.AddForce(moveDir.normalized * moveSpd * 10f * airMultiplier, ForceMode.Force);
     }
 
+    //prevents the player from sliding and overaccelerating
     private void speedCtrl()
     {
         Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
@@ -95,7 +95,6 @@ public class playerController : MonoBehaviour
 
     private void jump()
     {
-        Debug.Log("in jump()");
         rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
         rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);

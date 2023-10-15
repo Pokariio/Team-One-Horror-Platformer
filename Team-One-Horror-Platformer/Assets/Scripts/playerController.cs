@@ -4,6 +4,13 @@ using UnityEngine;
 
 public class playerController : MonoBehaviour
 {
+    private bool isGhost;
+
+    public float ghostDuration;
+    private float ghostTimeLeft;
+
+    public float ghostSpd = 10f;
+    public float livingSpd = 5f;
     public float moveSpd;
 
     public float drag;
@@ -13,7 +20,8 @@ public class playerController : MonoBehaviour
     public float airMultiplier;
     bool readyToJump = true;
 
-    public KeyCode jumpKey = KeyCode.Space; 
+    public KeyCode jumpKey = KeyCode.Space;
+    public KeyCode suicideKey = KeyCode.E;
 
     public float playerHeight;
     public LayerMask ground;
@@ -30,6 +38,8 @@ public class playerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        moveSpd = livingSpd;
+
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
     }
@@ -38,6 +48,15 @@ public class playerController : MonoBehaviour
     void Update()
     {
         onGround = Physics.Raycast(transform.position, Vector3  .down, playerHeight * .5f + .2f, ground);
+
+        //linearly reduce player speed during ghost state
+        Debug.Log(isGhost);
+        Debug.Log(ghostTimeLeft + " || " + Time.time);
+        if (isGhost && (Time.time < ghostTimeLeft))
+        {
+            Debug.Log(((ghostTimeLeft - Time.time) / ghostDuration) * ghostSpd);
+            moveSpd = ((ghostTimeLeft - Time.time) / ghostDuration) * ghostSpd;
+        }
 
         playerIn();
         speedCtrl();
@@ -64,6 +83,11 @@ public class playerController : MonoBehaviour
             readyToJump = false;
             jump();
             Invoke(nameof(resetJump), jumpCoolDown);
+        }
+
+        if (Input.GetKey(suicideKey))
+        {
+            transformToGhost();
         }
     }
 
@@ -103,5 +127,12 @@ public class playerController : MonoBehaviour
     private void resetJump()
     {
         readyToJump = true;
+    }
+
+    private void transformToGhost()
+    {
+        isGhost = true;
+        moveSpd = ghostSpd;
+        ghostTimeLeft = Time.time + ghostDuration;
     }
 }

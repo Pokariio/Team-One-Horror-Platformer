@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class playerController : MonoBehaviour
 {
+    public float interactionDistance;
+
+    public GameObject player;
+    public GameObject playerBody;
+
     private bool isGhost;
 
     public float ghostDuration;
@@ -21,7 +26,8 @@ public class playerController : MonoBehaviour
     bool readyToJump = true;
 
     public KeyCode jumpKey = KeyCode.Space;
-    public KeyCode suicideKey = KeyCode.E;
+    public KeyCode suicideKey = KeyCode.R;
+    public KeyCode interactKey = KeyCode.E;
 
     public float playerHeight;
     public LayerMask ground;
@@ -38,6 +44,8 @@ public class playerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        isGhost = false;
+
         moveSpd = livingSpd;
 
         rb = GetComponent<Rigidbody>();
@@ -50,11 +58,8 @@ public class playerController : MonoBehaviour
         onGround = Physics.Raycast(transform.position, Vector3  .down, playerHeight * .5f + .2f, ground);
 
         //linearly reduce player speed during ghost state
-        Debug.Log(isGhost);
-        Debug.Log(ghostTimeLeft + " || " + Time.time);
         if (isGhost && (Time.time < ghostTimeLeft))
         {
-            Debug.Log(((ghostTimeLeft - Time.time) / ghostDuration) * ghostSpd);
             moveSpd = ((ghostTimeLeft - Time.time) / ghostDuration) * ghostSpd;
         }
 
@@ -85,9 +90,15 @@ public class playerController : MonoBehaviour
             Invoke(nameof(resetJump), jumpCoolDown);
         }
 
-        if (Input.GetKey(suicideKey))
+        if (Input.GetKey(suicideKey) && !isGhost)
         {
             transformToGhost();
+        }
+
+        if(Input.GetKey(interactKey) && isGhost && (Vector3.Distance(transform.position, playerBody.transform.position) < interactionDistance))
+        {
+            Debug.Log("interacting with body");
+            transformToLiving();
         }
     }
 
@@ -134,5 +145,15 @@ public class playerController : MonoBehaviour
         isGhost = true;
         moveSpd = ghostSpd;
         ghostTimeLeft = Time.time + ghostDuration;
+
+        playerBody.transform.parent = null;
+    }
+
+    private void transformToLiving()
+    {
+        isGhost = false;
+        moveSpd = livingSpd;
+        playerBody.transform.position = player.transform.position;
+        playerBody.transform.SetParent(player.transform);
     }
 }

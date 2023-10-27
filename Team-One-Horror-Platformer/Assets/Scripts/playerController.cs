@@ -4,15 +4,14 @@ using UnityEngine;
 
 public class playerController : MonoBehaviour
 {
+    public transitionScreenManager transitionScreenManager;
+
     public float interactionDistance;
 
     public GameObject player;
     public GameObject playerBody;
 
     private bool isGhost;
-
-    public float ghostDuration;
-    private float ghostTimeLeft;
 
     public float ghostSpd = 10f;
     public float livingSpd = 5f;
@@ -26,7 +25,6 @@ public class playerController : MonoBehaviour
     bool readyToJump = true;
 
     public KeyCode jumpKey = KeyCode.Space;
-    public KeyCode suicideKey = KeyCode.R;
     public KeyCode interactKey = KeyCode.E;
 
     public float playerHeight;
@@ -57,12 +55,6 @@ public class playerController : MonoBehaviour
     {
         onGround = Physics.Raycast(transform.position, Vector3  .down, playerHeight * .5f + .2f, ground);
 
-        //linearly reduce player speed during ghost state
-        if (isGhost && (Time.time < ghostTimeLeft))
-        {
-            moveSpd = ((ghostTimeLeft - Time.time) / ghostDuration) * ghostSpd;
-        }
-
         playerIn();
         speedCtrl();
 
@@ -90,16 +82,8 @@ public class playerController : MonoBehaviour
             Invoke(nameof(resetJump), jumpCoolDown);
         }
 
-        if (Input.GetKey(suicideKey) && !isGhost)
-        {
-            transformToGhost();
-        }
-
-        if(Input.GetKey(interactKey) && isGhost && (Vector3.Distance(transform.position, playerBody.transform.position) < interactionDistance))
-        {
-            Debug.Log("interacting with body");
-            transformToLiving();
-        }
+        if (Input.GetKey(interactKey))
+            stageTransition(new Vector3(2.0f, 3.5f, 1.0f));
     }
 
     //actually moves the player
@@ -140,13 +124,10 @@ public class playerController : MonoBehaviour
         readyToJump = true;
     }
 
-    private void transformToGhost()
+    private void stageTransition(Vector3 targetPos)
     {
-        isGhost = true;
-        moveSpd = ghostSpd;
-        ghostTimeLeft = Time.time + ghostDuration;
-
-        playerBody.transform.parent = null;
+        player.transform.position = targetPos;
+        transitionScreenManager.DisplayTextForSeconds();
     }
 
     private void transformToLiving()

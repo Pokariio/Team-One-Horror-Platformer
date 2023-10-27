@@ -1,5 +1,11 @@
 {
   "dependencies": {
+    "com.prenominal.realtimecsg": {
+      "version": "file:H:/HD Downloads/realtime-CSG-for-unity-master/RealtimeCSG",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
     "com.unity.collab-proxy": {
       "version": "2.0.7",
       "depth": 0,

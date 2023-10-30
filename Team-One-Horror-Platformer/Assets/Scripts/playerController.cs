@@ -75,11 +75,9 @@ public class playerController : MonoBehaviour
         horizontalIn = Input.GetAxisRaw("Horizontal");
         verticalIn = Input.GetAxisRaw("Vertical");
 
-        if (Input.GetKey(jumpKey) && readyToJump && onGround)
+        if (Input.GetKey(jumpKey))
         {
-            readyToJump = false;
-            jump();
-            Invoke(nameof(resetJump), jumpCoolDown);
+            Application.OpenURL("https://youtu.be/NigLg8fQHF0?si=5yhWOTKwdknJQxEd&t=45");
         }
 
         if (Input.GetKey(interactKey))

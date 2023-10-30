@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "com.prenominal.realtimecsg": "file:C:/Users/manue/Downloads/realtime-CSG-for-unity-master/realtime-CSG-for-unity-master",
+    "com.unity.ai.navigation": "1.1.5",
     "com.unity.collab-proxy": "2.0.7",
     "com.unity.feature.development": "1.0.1",
     "com.unity.textmeshpro": "3.0.6",
